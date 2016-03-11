@@ -1,9 +1,10 @@
 (function (module) {
     mifosX.services = _.extend(module, {
         ResourceFactoryProvider: function () {
-            var baseUrl = "" , apiVer = "/mifosng-provider/api/v1", tenantIdentifier = "";
+            var baseUrl = "" , apiVer = "/fineract-provider/api/v1", tenantIdentifier = "";
             this.setBaseUrl = function (url) {
                 baseUrl = url;
+                console.log(baseUrl);
             };
 
             this.setTenantIdenetifier = function (tenant) {
@@ -46,6 +47,14 @@
                         getClientClosureReasons: {method: 'GET', params: {}},
                         getAllClientDocuments: {method: 'GET', params: {}, isArray: true},
                         update: { method: 'PUT'}
+                    }),
+                    clientChargesResource: defineResource(apiVer + "/clients/:clientId/charges/:resourceType", {clientId: '@clientId', resourceType: '@resourceType'}, {
+                        getCharges: {method: 'GET'},
+                        waive:{method:'POST' , params:{command : 'waive'}}
+                    }),
+                    clientTransactionResource: defineResource(apiVer + "/clients/:clientId/transactions/:transactionId", {clientId: '@clientId', transactionId: '@transactionId'}, {
+                        getTransactions: {method: 'GET',isArray: true},
+                        undoTransaction :{method:'POST', params:{command:'undo'}}
                     }),
                     clientIdentifierResource: defineResource(apiVer + "/client_identifiers/:clientIdentityId/documents", {clientIdentityId: '@clientIdentityId'}, {
                         get: {method: 'GET', params: {}, isArray: true}
@@ -407,7 +416,15 @@
                     loanReassignmentResource: defineResource(apiVer + "/loans/loanreassignment/:templateSource", {templateSource: '@templateSource'}, {
                         get: {method: 'GET', params: {}}
                     }),
-                    auditResource: defineResource(apiVer + "/audits/:templateResource", {templateResource: '@templateResource'}, {
+                    loanRescheduleResource: defineResource(apiVer + "/rescheduleloans/:scheduleId",{scheduleId:'@scheduleId'},{
+                     get: {method: 'GET',params:{}},
+                     template: {method: 'GET',params:{}},
+                     preview:{method:'GET',params:{command:'previewLoanReschedule'}},
+                     put: {method: 'POST', params: {command:'reschedule'}},
+                     reject:{method:'POST',params:{command:'reject'}},
+                     approve:{method:'POST',params:{command:'approve'}}
+                     }),
+                     auditResource: defineResource(apiVer + "/audits/:templateResource", {templateResource: '@templateResource'}, {
                         get: {method: 'GET', params: {}},
                         search: {method: 'GET', params: {}, isArray: false}
                     }),
@@ -486,6 +503,57 @@
                         getAll: {method: 'GET', params: {}, isArray: true},
                         get: {method: 'GET' , params: {paymentTypeId: '@paymentTypeId'}},
                         update: {method: 'PUT', params: {paymentTypeId: '@paymentTypeId'}}
+                    }),
+                    externalServicesS3Resource: defineResource(apiVer + "/externalservice/S3", {},{
+                        get: {method: 'GET', params: {}, isArray : true},
+                        put: {method: 'PUT', params:{}}
+                    }),
+                    externalServicesSMTPResource: defineResource(apiVer + "/externalservice/SMTP", {},{
+                        get: {method: 'GET', params: {}, isArray : true},
+                        put: {method: 'PUT', params:{}}
+                    }),
+                    externalServicesResource: defineResource(apiVer + "/externalservice/:id", {id: '@id'},{
+                        get: {method: 'GET', params: {}, isArray : true},
+                        put: {method: 'PUT', params:{}}
+                    }),
+                    provisioningcriteria: defineResource(apiVer + "/provisioningcriteria/:criteriaId",{criteriaId:'@criteriaId'},{
+                        get: {method: 'GET',params:{}},
+                        getAll: {method: 'GET',params:{}, isArray : true},
+                        template: {method: 'GET',params:{}},
+                        post:{method:'POST',params:{}},
+                        put: {method: 'PUT', params: {}}
+                    }),
+                    provisioningentries: defineResource(apiVer + "/provisioningentries/:entryId",{entryId:'@entryId'},{
+                        get: {method: 'GET',params:{}},
+                        getAll: {method: 'GET',params:{}},
+                        template: {method: 'GET',params:{}},
+                        post:{method:'POST',params:{}},
+                        put: {method: 'PUT', params: {}},
+                        createJournals:{method:'POST', params:{command : 'createjournalentry'}},
+                        reCreateProvisioningEntries:{method:'POST', params:{command : 'recreateprovisioningentry'}},
+                        getJournals: {method: 'GET', params: {entryId: '@entryId'}}
+                    }),
+                    provisioningjournals: defineResource(apiVer + "/journalentries/provisioning", {}, {
+                        get: {method: 'GET', params: {}}
+                    }),
+                    provisioningentriesSearch: defineResource(apiVer + "/provisioningentries/entries", {}, {
+                        get: {method: 'GET', params: {}}
+                    }),
+
+                    provisioningcategory: defineResource(apiVer + "/provisioningcategory", {}, {
+                        getAll: {method: 'GET', params: {}, isArray : true}
+                    }),
+
+                    floatingrates: defineResource(apiVer + "/floatingrates/:floatingRateId",{floatingRateId:'@floatingRateId'},{
+                        get: {method: 'GET',params:{}},
+                        getAll: {method: 'GET',params:{}, isArray : true},
+                        post:{method:'POST',params:{}},
+                        put: {method: 'PUT', params: {}}
+                    }),
+                    variableinstallments: defineResource(apiVer + "/loans/:loanId/schedule",{loanId:'@loanId'},{
+                        validate:{method:'POST',params:{command: 'calculateLoanSchedule'}},
+                        addVariations:{method:'POST',params:{command: 'addVariations'}},
+                        deleteVariations:{method:'POST',params:{command: 'deleteVariations'}}
                     })
                 };
             }];
